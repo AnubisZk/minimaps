@@ -154,6 +154,12 @@ function openOpentopoKeyDialog(message) {
 }
 function closeOpentopoKeyDialog() { $('opentopo-key-dialog').hidden = true; }
 
+// Map-screen button — lets users add/change their OpenTopo key any time, in
+// case they skipped the first-run banner. Opens the same dialog.
+$('opentopo-key-btn').addEventListener('click', () => {
+  openOpentopoKeyDialog('Paste your free OpenTopography API key here');
+});
+
 $('opentopo-key-cancel').addEventListener('click', closeOpentopoKeyDialog);
 $('opentopo-key-save').addEventListener('click', () => {
   const v = $('opentopo-key-input').value.trim();
