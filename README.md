@@ -68,7 +68,7 @@ licence terms.
   reference layers.
 - **Place names** — [Nominatim](https://nominatim.org) reverse geocoding.
 - **3D engine** — [three.js](https://threejs.org).
-- **Built with the help of [Claude](https://claude.com/claude-code) 
+- Built with the help of [Claude](https://claude.com/claude-code) 
 
 ## Credits
 
