@@ -85,6 +85,31 @@
         </div>
       </div>
 
+      <!-- OpenTopo key dialog: global overlay so it can be opened from the
+           landing page (first-run banner) as well as the map screen. -->
+      <div id="opentopo-key-dialog" hidden>
+        <div class="key-dialog-inner">
+          <h3>OpenTopography API key</h3>
+          <p>
+            Copernicus DEM is served via
+            <a href="https://opentopography.org" target="_blank" rel="noopener">OpenTopography</a>,
+            which needs a free API key. Sign up, copy your key, and paste it
+            here. It's stored only in your browser.
+          </p>
+          <p class="key-dialog-tip">
+            Prefer no signup? Switch the <strong>Elevation</strong> dropdown
+            to <strong>AWS Terrain</strong>: it's keyless and global.
+          </p>
+          <input type="text" id="opentopo-key-input" placeholder="Paste your key here" autocomplete="off" spellcheck="false">
+          <div class="key-dialog-actions">
+            <button id="opentopo-key-clear" class="secondary">Clear saved key</button>
+            <span style="flex:1"></span>
+            <button id="opentopo-key-cancel" class="secondary">Cancel</button>
+            <button id="opentopo-key-save">Save</button>
+          </div>
+        </div>
+      </div>
+
       <section id="map-view" class="view">
         <div id="map"></div>
         <div id="map-overlay"><div id="capture-square"></div></div>
@@ -97,28 +122,6 @@
           </label>
           <button id="opentopo-key-btn" class="secondary" title="Add or change your free OpenTopography API key (needed for Copernicus elevation)">🔑 OpenTopo key</button>
           <button id="capture-btn">Capture</button>
-        </div>
-        <div id="opentopo-key-dialog" hidden>
-          <div class="key-dialog-inner">
-            <h3>OpenTopography API key</h3>
-            <p>
-              Copernicus DEM is served via
-              <a href="https://opentopography.org" target="_blank" rel="noopener">OpenTopography</a>,
-              which needs a free API key. Sign up, copy your key, and paste it
-              here. It's stored only in your browser.
-            </p>
-            <p class="key-dialog-tip">
-              Prefer no signup? Switch the <strong>Elevation</strong> dropdown
-              to <strong>AWS Terrain</strong>: it's keyless and global.
-            </p>
-            <input type="text" id="opentopo-key-input" placeholder="Paste your key here" autocomplete="off" spellcheck="false">
-            <div class="key-dialog-actions">
-              <button id="opentopo-key-clear" class="secondary">Clear saved key</button>
-              <span style="flex:1"></span>
-              <button id="opentopo-key-cancel" class="secondary">Cancel</button>
-              <button id="opentopo-key-save">Save</button>
-            </div>
-          </div>
         </div>
         <div id="map-search">
           <input type="search" id="search-input" placeholder="Search a place…" autocomplete="off">

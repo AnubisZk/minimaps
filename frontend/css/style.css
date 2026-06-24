@@ -317,7 +317,7 @@ body.view-gallery #library { display: none; }
 
 /* OpenTopography key dialog - modal sheet over the map. */
 #opentopo-key-dialog {
-  position: absolute; inset: 0; z-index: 1500;
+  position: fixed; inset: 0; z-index: 5000;
   background: rgba(40, 35, 22, 0.35); backdrop-filter: blur(3px);
   display: flex; align-items: center; justify-content: center;
 }
