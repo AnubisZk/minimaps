@@ -34,14 +34,14 @@ export function buildWaterMask(overpass, heightmap, bounds, demtype) {
 
   let painted = false;
 
-  // Step 1: Inland water (OSM polygons) — vector-drawn directly to the mask
+  // Step 1: Inland water (OSM polygons) - vector-drawn directly to the mask
   // since these come from real coastline vectors (no resolution problem). R=255.
   if (overpass?.elements) {
     ctx.fillStyle = 'rgb(255, 0, 0)';
     for (const el of overpass.elements) {
       if (el.type !== 'way' || !Array.isArray(el.geometry)) continue;
       // Overpass sometimes returns null vertices at bbox edges (ways clipped
-      // to the query box). Drop them — the rest of the outline is fine to
+      // to the query box). Drop them - the rest of the outline is fine to
       // draw as long as we have ≥3 valid points.
       const pts = el.geometry.filter(p => p && p.lon != null && p.lat != null);
       if (pts.length < 3) continue;
@@ -61,7 +61,7 @@ export function buildWaterMask(overpass, heightmap, bounds, demtype) {
 
   // Step 2: Ocean from heightmap zero-elevation. Build at heightmap resolution
   // (~256×256), then BILINEAR-UPSCALE onto the 1024 mask. This is the key
-  // anti-aliasing step — the canvas does smooth interpolation between cells so
+  // anti-aliasing step - the canvas does smooth interpolation between cells so
   // the coastline becomes a soft ~half-cell gradient instead of a step.
   // Drawn LAST so heightmap-detected ocean correctly wins over OSM water in
   // coastal bays (those should be flagged as ocean, B=255).
@@ -112,7 +112,7 @@ export function buildWaterMask(overpass, heightmap, bounds, demtype) {
   return canvas;
 }
 
-// Alpha-only mask used to composite ESRI Ocean Base over the land albedo —
+// Alpha-only mask used to composite ESRI Ocean Base over the land albedo -
 // alpha is set wherever heightmap-zero ocean was detected. Returns null if
 // either no ocean was found or the DEM doesn't reliably mark sea level.
 export function buildOceanAlphaMask(heightmap, demtype, size) {
@@ -137,7 +137,7 @@ export function buildOceanAlphaMask(heightmap, demtype, size) {
   if (!any) return null;
   sctx.putImageData(img, 0, 0);
 
-  // Bilinear upscale to target size — gives soft, anti-aliased coast lines.
+  // Bilinear upscale to target size - gives soft, anti-aliased coast lines.
   const big = document.createElement('canvas');
   big.width = size;
   big.height = size;

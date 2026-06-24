@@ -31,7 +31,7 @@ def _classify(text: str) -> str:
 
 
 def _log(*parts):
-    """Single-line timestamped log — appears in the Flask terminal so the
+    """Single-line timestamped log - appears in the Flask terminal so the
     Overpass handshake is visible alongside Flask's normal request logs,
     AND is mirrored into the in-app dev console buffer."""
     ts = time.strftime("%H:%M:%S")
@@ -50,7 +50,7 @@ def _log(*parts):
 # === Overpass response cache ===========================================
 # Public Overpass mirrors are flaky under load. Disk-caching responses by
 # query hash means repeat fetches for the same bbox are instant and never
-# touch the network — same trick Blender GIS uses. OSM building data
+# touch the network - same trick Blender GIS uses. OSM building data
 # changes slowly enough that cache-forever is fine; bust by deleting the
 # cache dir or the specific file.
 #
@@ -83,7 +83,7 @@ def _cache_get(query: str):
 def _cache_put(query: str, body: str):
     if not CACHE_ENABLED:
         return
-    # Skip empties — likely throttle-induced and we want to retry next time.
+    # Skip empties - likely throttle-induced and we want to retry next time.
     try:
         parsed = json.loads(body)
         if not parsed.get("elements"):
@@ -98,10 +98,10 @@ def _cache_put(query: str, body: str):
         _log(f"cache write failed: {e}")
 
 # OpenTopography API key resolution, in priority order:
-#   1. ?key=... on the heightmap request — supplied by the browser from the
+#   1. ?key=... on the heightmap request - supplied by the browser from the
 #      user's own saved key. This is the path used in production / shared
 #      deployments where every visitor brings their own key.
-#   2. OPENTOPO_KEY environment variable — convenient for local development
+#   2. OPENTOPO_KEY environment variable - convenient for local development
 #      so you don't have to paste your key into the UI on every boot.
 # If neither is present the /api/heightmap endpoint returns a 400 with a
 # `needs_key` flag so the frontend can prompt the user.
@@ -183,13 +183,13 @@ def heightmap():
 
     # Latitude coverage limits per DEM. SRTM-family instruments only flew
     # between ~60°N and ~56°S, so anything outside that band returns HTTP 204
-    # (No Content) — a coverage gap, NOT a transient error. Catch it up front
+    # (No Content) - a coverage gap, NOT a transient error. Catch it up front
     # so we can give a precise "switch to X" message instead of a vague fail.
     DEM_LAT_COVERAGE = {
         "SRTMGL1": (-56.0, 60.0),
         "SRTMGL3": (-56.0, 60.0),
         "NASADEM": (-56.0, 60.0),
-        "AW3D30":  (-82.0, 82.0),   # JAXA ALOS — near-global, handles high lat
+        "AW3D30":  (-82.0, 82.0),   # JAXA ALOS - near-global, handles high lat
         # COP30 is fully global (poles included), so no entry = no gate.
     }
     cov = DEM_LAT_COVERAGE.get(demtype)
@@ -237,8 +237,8 @@ def heightmap():
     except urllib.error.HTTPError as e:
         dur = time.time() - started
         body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
-        _log(f"{dem_label}: HTTP {e.code} in {dur:.1f}s — body[:200]={body[:200]!r}")
-        # OpenTopography uses 401 (bad key) and 429 (quota) — surface those as
+        _log(f"{dem_label}: HTTP {e.code} in {dur:.1f}s - body[:200]={body[:200]!r}")
+        # OpenTopography uses 401 (bad key) and 429 (quota) - surface those as
         # key issues so the frontend re-opens the key dialog.
         needs_key = e.code in (401, 403, 429)
         return jsonify({
@@ -248,7 +248,7 @@ def heightmap():
         }), 502
     except urllib.error.URLError as e:
         dur = time.time() - started
-        _log(f"{dem_label}: network error in {dur:.1f}s — {e.reason}")
+        _log(f"{dem_label}: network error in {dur:.1f}s - {e.reason}")
         return jsonify({"error": "OpenTopography network error", "detail": str(e.reason)}), 502
 
     dur = time.time() - started
@@ -274,7 +274,7 @@ def heightmap():
             # load. Either way, recommend an alternative DEM rather than
             # silently substituting one.
             body["detail"] = ("OpenTopography returned no elevation data for this region. "
-                              "This DEM may have a coverage void here — try 'Copernicus 30m' "
+                              "This DEM may have a coverage void here - try 'Copernicus 30m' "
                               "or 'AWS Terrain (no key)' from the DEM dropdown.")
             body["coverage_gap"] = True
         elif any(kw in flag for kw in ("api_key", "api key", "invalid key", "unauthorized", "exceed", "quota", "limit")):
@@ -284,7 +284,7 @@ def heightmap():
     try:
         return jsonify(_parse_aaigrid(text))
     except Exception as e:
-        _log(f"{dem_label}: parse failed — {e}")
+        _log(f"{dem_label}: parse failed - {e}")
         return jsonify({"error": "Failed to parse heightmap", "detail": str(e), "head": text[:400]}), 502
 
 
@@ -350,7 +350,7 @@ def _overpass_query(query: str, timeout: int = 25, label: str = "overpass", veri
     _log(f"{label}: query length={len(query)}, mirrors={len(OVERPASS_MIRRORS)}, verify_empty={verify_empty}")
     last_err = None
     tried = []
-    pending_empty = None  # (body, url, host) — held in case next mirror confirms
+    pending_empty = None  # (body, url, host) - held in case next mirror confirms
 
     for i, url in enumerate(OVERPASS_MIRRORS, start=1):
         host = url.split("//", 1)[-1].split("/", 1)[0]
@@ -386,12 +386,12 @@ def _overpass_query(query: str, timeout: int = 25, label: str = "overpass", veri
                         elements = None
                     if elements is not None and len(elements) == 0:
                         if pending_empty is None:
-                            _log(f"{label}: {i}/{len(OVERPASS_MIRRORS)} {host} returned EMPTY in {dur:.1f}s — verifying with next mirror")
+                            _log(f"{label}: {i}/{len(OVERPASS_MIRRORS)} {host} returned EMPTY in {dur:.1f}s - verifying with next mirror")
                             pending_empty = (body, url, host)
                             continue
                         else:
-                            # Two mirrors in a row say empty — accept it.
-                            _log(f"{label}: {i}/{len(OVERPASS_MIRRORS)} {host} also empty in {dur:.1f}s — confirmed genuinely empty")
+                            # Two mirrors in a row say empty - accept it.
+                            _log(f"{label}: {i}/{len(OVERPASS_MIRRORS)} {host} also empty in {dur:.1f}s - confirmed genuinely empty")
                             return body, url
 
                 _log(f"{label}: {i}/{len(OVERPASS_MIRRORS)} {host} OK in {dur:.1f}s, {len(body)} bytes")
@@ -410,16 +410,16 @@ def _overpass_query(query: str, timeout: int = 25, label: str = "overpass", veri
             continue
 
     # All mirrors exhausted. If we held an empty response from earlier, return
-    # it now (better than nothing — caller will report "0 buildings").
+    # it now (better than nothing - caller will report "0 buildings").
     if pending_empty is not None:
         body, url, host = pending_empty
-        _log(f"{label}: exhausted — falling back to held empty response from {host}")
+        _log(f"{label}: exhausted - falling back to held empty response from {host}")
         return body, url
 
     msg = f"All {len(OVERPASS_MIRRORS)} Overpass mirrors failed (tried: {', '.join(tried)})"
     if last_err:
-        msg += f" — last error: {type(last_err).__name__}: {last_err}"
-    _log(f"{label}: EXHAUSTED — {msg}")
+        msg += f" - last error: {type(last_err).__name__}: {last_err}"
+    _log(f"{label}: EXHAUSTED - {msg}")
     raise RuntimeError(msg)
 
 
@@ -472,8 +472,8 @@ def water():
         _cache_put(query, data)
         return app.response_class(data, mimetype="application/json")
     except Exception as e:
-        # Water is non-fatal — let the puck render without it.
-        _log(f"{bbox_label}: FAILED — {e}")
+        # Water is non-fatal - let the puck render without it.
+        _log(f"{bbox_label}: FAILED - {e}")
         return jsonify({"error": "Overpass unavailable", "detail": str(e)}), 502
     except urllib.error.URLError as e:
         return jsonify({"error": "Overpass network error", "detail": str(e.reason)}), 502
@@ -506,7 +506,7 @@ def buildings():
     )
     bbox_label = f"buildings[{south:.4f},{west:.4f},{north:.4f},{east:.4f}]"
 
-    # Cache hit path — return immediately, no network. Pass through a header
+    # Cache hit path - return immediately, no network. Pass through a header
     # so the frontend devtools can see it was served locally.
     cached = _cache_get(query)
     if cached is not None:
@@ -523,7 +523,7 @@ def buildings():
         data, used = _overpass_query(query, timeout=25, label=bbox_label, verify_empty=True)
         _cache_put(query, data)
         # Count elements for the log so we can see if a "successful" fetch
-        # came back empty — common cause of silent UI failures.
+        # came back empty - common cause of silent UI failures.
         try:
             parsed = json.loads(data)
             elements = parsed.get("elements", [])
@@ -546,7 +546,7 @@ def buildings():
         response.headers["X-Overpass-Mirror"] = used
         return response
     except Exception as e:
-        _log(f"{bbox_label}: FAILED — {e}")
+        _log(f"{bbox_label}: FAILED - {e}")
         return jsonify({
             "error": "All Overpass mirrors unavailable",
             "detail": str(e),

@@ -1,6 +1,6 @@
 # Minimap Maker
 
-Browser-based generator for map relief "pucks" — squared-off terrain tiles built
+Browser-based generator for map relief "pucks" - squared-off terrain tiles built
 from satellite imagery draped over real elevation data. Pan a map, frame a
 region, and a textured 3D model pops out the other end, ready to export as PNG,
 WebM, STL, OBJ, or GLB.
@@ -22,7 +22,7 @@ WebM, STL, OBJ, or GLB.
 ## What it does
 
 - **Frame** any spot on Earth on a satellite map with country borders and labels.
-- **Capture** the region — imagery is stitched and draped over a real elevation
+- **Capture** the region - imagery is stitched and draped over a real elevation
   model to build a 3D relief puck.
 - **Style** it with filters, lighting, and z-exaggeration controls.
 - **Export** as PNG, WebM, STL / OBJ, or
@@ -48,31 +48,31 @@ Open <http://127.0.0.1:5001/> in your browser.
 On Windows, once cloned, you can also just double-click **`launch.bat`**, which
 starts the server and opens the browser for you.
 
-## Elevation data — pick your source
+## Elevation data - pick your source
 
 When you capture, choose an elevation source:
 
-- **Copernicus DEM 30m** (default, sharpest) — served via
+- **Copernicus DEM 30m** (default, sharpest) - served via
   [OpenTopography](https://opentopography.org), which needs a **free API key**.
   The app prompts you for it the first time; it's stored only in your browser.
-- **AWS Terrain** — keyless and global, no signup. Pick this if you'd rather
+- **AWS Terrain**: keyless and global, no signup. Pick this if you'd rather
   skip the key step.
 
 ## Data sources & attribution
 
 Minimap Maker is a non-commercial, personal-use project. Pucks are derived works
-of the data sources below — if you redistribute them, follow each provider's
+of the data sources below - if you redistribute them, follow each provider's
 licence terms.
 
-- **Elevation** — Copernicus DEM (ESA) and AWS Open Terrain Tiles, via
+- **Elevation**: Copernicus DEM (ESA) and AWS Open Terrain Tiles, via
   [OpenTopography](https://opentopography.org) where applicable.
-- **Satellite imagery** — Esri World Imagery (© Esri, Maxar, Earthstar
+- **Satellite imagery**: Esri World Imagery (© Esri, Maxar, Earthstar
   Geographics).
-- **Map / buildings / water / labels** — ©
+- **Map / buildings / water / labels**: ©
   [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors and Esri
   reference layers.
-- **Place names** — [Nominatim](https://nominatim.org) reverse geocoding.
-- **3D engine** — [three.js](https://threejs.org).
+- **Place names**: [Nominatim](https://nominatim.org) reverse geocoding.
+- **3D engine**: [three.js](https://threejs.org).
 - Built with the help of [Claude](https://claude.com/claude-code) 
 
 ## Credits

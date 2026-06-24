@@ -1,8 +1,8 @@
 // OSM building extrusions, draped on top of the puck terrain.
 //
 // Workflow:
-//   1. fetchBuildings(bounds)  — hits our /api/buildings Overpass proxy.
-//   2. buildBuildingGroup(overpass, geoParams)  — returns a THREE.Group of
+//   1. fetchBuildings(bounds)  - hits our /api/buildings Overpass proxy.
+//   2. buildBuildingGroup(overpass, geoParams)  - returns a THREE.Group of
 //      merged extrusion meshes positioned in the puck's local coord system.
 //
 // Coordinate system (matches puck.js):
@@ -25,7 +25,7 @@ const LEVEL_HEIGHT_M     = 3.0;     // metres per "building:level"
 const MAX_BUILDINGS      = 8000;    // protect the renderer + main thread
 
 // Flat fallback when OSM provides no `height` and no `building:levels`. We
-// deliberately do NOT guess based on `building=<type>` — type-based defaults
+// deliberately do NOT guess based on `building=<type>` - type-based defaults
 // are wrong too often (e.g. a single-storey rural school gets the same
 // height as a multi-storey city one), and the resulting variation reads as
 // "real data" when it isn't. A consistent low default is more honest:
@@ -66,7 +66,7 @@ export async function fetchBuildings(bounds) {
     if (body?.error)  parts.push(body.error);
     if (body?.detail) parts.push(body.detail);
     if (body?.hint)   parts.push(body.hint);
-    const detail = parts.join(' — ')
+    const detail = parts.join(' - ')
       || (await res.text().catch(() => '')).slice(0, 200);
     console.warn(`[buildings] fetch failed after ${dur}s:`, body || detail);
     throw new Error(`Building fetch failed (${res.status}) after ${dur}s: ${detail}`);
@@ -91,7 +91,7 @@ export async function fetchBuildings(bounds) {
 //   1. explicit `height` tag (parsed for "m"/"ft" suffix)
 //   2. `building:levels` * LEVEL_HEIGHT_M
 //   3. DEFAULT_HEIGHT_M flat fallback
-// No type-based guessing and no jitter — see the comment on DEFAULT_HEIGHT_M
+// No type-based guessing and no jitter - see the comment on DEFAULT_HEIGHT_M
 // for why we treat "no data" as visibly uniform rather than fake-varied.
 function resolveHeightM(element) {
   const tags = element?.tags || {};
@@ -112,7 +112,7 @@ function resolveHeightM(element) {
   return DEFAULT_HEIGHT_M;
 }
 
-// Sample the heightmap at a (lon, lat) — returns puck-local Y in cm,
+// Sample the heightmap at a (lon, lat) - returns puck-local Y in cm,
 // matching the same formula used by buildTerrainBoxGeometry in puck.js.
 function makeTerrainSampler(geoParams) {
   const { bounds, heightmap, baseThickness, terrainHeightCm, minH, heightRange } = geoParams;
@@ -191,7 +191,7 @@ function collectOutlines(overpass) {
 //   u = (x + half) / size
 //   v = (half - z) / size   (so north → v=1, south → v=0)
 // Roofs sample the satellite pixel directly above them; side walls share the
-// same XZ so they pick up a vertical streak of that pixel — intentionally
+// same XZ so they pick up a vertical streak of that pixel - intentionally
 // messy, gives the buildings an organic painted-from-above look.
 function applyPlanarXZUVs(geom, size) {
   const half = size / 2;
@@ -206,7 +206,7 @@ function applyPlanarXZUVs(geom, size) {
   geom.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
 }
 
-// Per-vertex 0..1 "how high up the building's body am I?" — 0 at the base
+// Per-vertex 0..1 "how high up the building's body am I?" - 0 at the base
 // (sits on the terrain), 1 at the roof. The merged geometry preserves this
 // per-building, so the shader can drive a ground-shade gradient that's
 // anchored to each individual building's height rather than to global Y.
@@ -230,13 +230,13 @@ export function buildBuildingGroup(overpass, geoParams, opts = {}) {
   // Real metres → puck cm at true scale, then * BUILDING_VERTICAL_BOOST so
   // buildings actually read at puck scale. Z-exaggeration is deliberately
   // NOT applied: that's a topographic-stylisation knob, not a scene-wide
-  // vertical scale — buildings keep their proportions to each other when
+  // vertical scale - buildings keep their proportions to each other when
   // the surrounding terrain is stretched.
   const mToPuckCm = (size / widthM) * BUILDING_VERTICAL_BOOST;
 
   const outlines = collectOutlines(overpass);
   if (outlines.length > MAX_BUILDINGS) {
-    console.warn(`OSM returned ${outlines.length} buildings — clipping to ${MAX_BUILDINGS} to stay performant`);
+    console.warn(`OSM returned ${outlines.length} buildings - clipping to ${MAX_BUILDINGS} to stay performant`);
     outlines.length = MAX_BUILDINGS;
   }
 
@@ -247,7 +247,7 @@ export function buildBuildingGroup(overpass, geoParams, opts = {}) {
     const { pts, centroidLon, centroidLat } = project(o.geometry, geoParams);
     if (pts.length < 3) continue;
 
-    // Cull buildings whose centroid falls outside the puck footprint —
+    // Cull buildings whose centroid falls outside the puck footprint -
     // Overpass can return ways whose bbox just touches our region.
     const half = size / 2;
     if (Math.abs(pts[0].x) > half + 0.1 && Math.abs(pts[0].z) > half + 0.1) continue;
@@ -266,7 +266,7 @@ export function buildBuildingGroup(overpass, geoParams, opts = {}) {
     try {
       g = new THREE.ExtrudeGeometry(shape, { depth: heightCm, bevelEnabled: false });
     } catch {
-      continue; // degenerate polygon — skip
+      continue; // degenerate polygon - skip
     }
     g.rotateX(-Math.PI / 2);
 
@@ -291,7 +291,7 @@ export function buildBuildingGroup(overpass, geoParams, opts = {}) {
 
   if (!geoms.length) return group;
 
-  // Merge into one buffer per material — single draw call for the whole city.
+  // Merge into one buffer per material - single draw call for the whole city.
   const merged = mergeGeometries(geoms, false);
   const mat = makeBuildingMaterial(projectTexture ? albedoCanvas : null, { wallsOffWhite });
   // mergeGeometries returns null if the inputs are inconsistent; fall back
@@ -308,17 +308,17 @@ export function buildBuildingGroup(overpass, geoParams, opts = {}) {
 }
 
 // Build the building material with two stylising shader patches:
-//   1. Ground-shade gradient — anchored to each building's own height via the
+//   1. Ground-shade gradient - anchored to each building's own height via the
 //      per-vertex aVerticality attribute. The bottom of every building is
 //      multiplied by uGroundShade (default 0.55), fading smoothly to no
 //      darkening by roughly half the building's height. Gives the AO-at-base
 //      look that osmbuildings.org has.
-//   2. Optional off-white walls — when uWallsOffWhite is on, side faces
+//   2. Optional off-white walls - when uWallsOffWhite is on, side faces
 //      (those whose world-space normal points sideways) replace the planar-
 //      projected texture with a flat warm off-white. Roof faces (normal.y
 //      near +1) keep the satellite texture as before.
 // flatShading is OFF because ExtrudeGeometry already duplicates vertices
-// per face, so the per-face input normals carry through cleanly — and we
+// per face, so the per-face input normals carry through cleanly - and we
 // need them as a world-space varying for the roof/wall discrimination.
 const GROUND_SHADE_DEFAULT = 0.55;
 

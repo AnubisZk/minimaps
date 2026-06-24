@@ -1,4 +1,4 @@
-// Puck library — persisted via IndexedDB so storage isn't capped at the
+// Puck library - persisted via IndexedDB so storage isn't capped at the
 // ~5 MB localStorage limit. On first run we auto-migrate any pucks that were
 // saved under the old localStorage scheme so nothing is lost.
 
@@ -76,7 +76,7 @@ export async function saveToLibrary(puck, providedName, defaultNameHint) {
 
   const thumbnail = albedoCanvas ? thumbnailFromCanvas(albedoCanvas) : albedoSerialized;
 
-  // defaultNameHint comes from the caller — typically a reverse-geocoded
+  // defaultNameHint comes from the caller - typically a reverse-geocoded
   // place name like 'Ronda, Andalusia'. Falls back to the generic
   // 'Puck <date>' string if the caller has nothing better to offer.
   const promptDefault = (defaultNameHint && defaultNameHint.trim()) || defaultName();

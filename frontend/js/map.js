@@ -1,6 +1,6 @@
 // Map setup + capture. All tile traffic is routed through the local Flask
 // proxy (/api/tile/<provider>/...) so we avoid cross-origin tainting when we
-// stitch the capture into a canvas — and so we can swap providers freely.
+// stitch the capture into a canvas - and so we can swap providers freely.
 
 // `hidden: true` keeps the entry registered (so saved pucks that reference
 // it still load + render correctly) but omits it from any picker UI.
@@ -41,7 +41,7 @@ export function getProviderMaxZoom(providerKey) {
 export const STITCH_OUT_PX = 4096;
 
 // "Saturation zoom": the (fractional) zoom at which the captured region's
-// native tile pixels span ~STITCH_OUT_PX — i.e. tiles map ~1:1 onto the
+// native tile pixels span ~STITCH_OUT_PX - i.e. tiles map ~1:1 onto the
 // output. Longitude is linear in Web-Mercator tile-x, so this is exact for
 // the horizontal axis. Beyond this zoom we fetch more tiles than the output
 // can show (pure waste) and risk requesting zoom levels the provider doesn't
@@ -70,7 +70,7 @@ export function usefulZoomRange(bounds, provider, captureZoom, coarseSteps = 5) 
 }
 
 // Re-stitch just the albedo for an already-captured puck at a new zoom level.
-// Used by the post-capture Resolution control — no heightmap re-query.
+// Used by the post-capture Resolution control - no heightmap re-query.
 export async function refetchAlbedo(bounds, provider, captureZoom, onProgress) {
   const name = PROVIDERS[provider]?.name || provider;
   onProgress?.(`Re-stitching ${name} at z${captureZoom}…`);
@@ -88,7 +88,7 @@ export function setupMap(elId, providerKey = DEFAULT_PROVIDER) {
   setImagery(map, providerKey);
   // Country lines + place labels on top of the satellite imagery so the user
   // can orient themselves before drawing a capture box. Esri's transparent
-  // reference layer — already attributed via the underlying imagery layer.
+  // reference layer - already attributed via the underlying imagery layer.
   const labelsLayer = L.tileLayer('/api/tile/esri-labels/{z}/{y}/{x}', {
     maxZoom: 19,
     attribution: '',
@@ -100,7 +100,7 @@ export function setupMap(elId, providerKey = DEFAULT_PROVIDER) {
 }
 
 // Width in meters of the geographic region currently framed by the on-screen
-// square — depends on map zoom, center latitude, and the square's pixel size.
+// square - depends on map zoom, center latitude, and the square's pixel size.
 export function getRegionWidthMeters(map, squareEl) {
   const mapRect = map.getContainer().getBoundingClientRect();
   const sq = squareEl.getBoundingClientRect();
@@ -139,7 +139,7 @@ export async function capture(map, squareEl, demtype, onProgress, captureZoomOve
 
   const provider = activeProvider;
   const maxZ = PROVIDERS[provider].maxZoom;
-  // Snap to integer — fractional zoom is fine for display (Leaflet upscales
+  // Snap to integer - fractional zoom is fine for display (Leaflet upscales
   // integer tiles) but tile requests must use integer z.
   const baseZoom = Math.round(map.getZoom());
   const captureZoom = captureZoomOverride != null
@@ -152,7 +152,7 @@ export async function capture(map, squareEl, demtype, onProgress, captureZoomOve
   onProgress?.('Fetching elevation data…');
   const heightmap = await fetchHeightmap(bounds, demtype, onProgress);
 
-  // Region width in meters — passed through for the scale-aware shader.
+  // Region width in meters - passed through for the scale-aware shader.
   const midLat = (bounds.north + bounds.south) / 2;
   const regionWidthM = (bounds.east - bounds.west) * 111320 * Math.cos(midLat * Math.PI / 180);
 
@@ -210,7 +210,7 @@ async function stitchTiles(bounds, z, provider) {
 }
 
 // Tile loader with retry + backoff. Returns null after exhausting retries so
-// one dropped tile doesn't abort the whole stitch — leaves a small dark patch
+// one dropped tile doesn't abort the whole stitch - leaves a small dark patch
 // in the texture, which is preferable to the entire capture failing.
 function loadTile(provider, x, y, z, attempt = 0) {
   const MAX_ATTEMPTS = 3;
@@ -232,7 +232,7 @@ function loadTile(provider, x, y, z, attempt = 0) {
   });
 }
 
-// Bounded-parallel runner — keeps at most `limit` jobs in flight at once.
+// Bounded-parallel runner - keeps at most `limit` jobs in flight at once.
 async function runWithConcurrency(jobFactories, limit) {
   let next = 0;
   const workers = Array.from({ length: Math.min(limit, jobFactories.length) }, async () => {
@@ -295,27 +295,27 @@ async function fetchHeightmap(bounds, demtype, onProgress) {
     throw new NeedsOpentopoKeyError(body.detail || 'OpenTopography API key required.');
   }
 
-  // No silent substitution. Surface exactly what happened — including the
-  // coverage-gap case (e.g. SRTM has no data above 60°N) — so the user can
+  // No silent substitution. Surface exactly what happened - including the
+  // coverage-gap case (e.g. SRTM has no data above 60°N) - so the user can
   // make an informed choice about which DEM to switch to.
   const parts = [];
   if (body?.error)  parts.push(body.error);
   if (body?.detail) parts.push(body.detail);
   if (body?.head)   parts.push('Response head: ' + body.head);
-  const detail = parts.join(' — ') || (await res.text().catch(() => '')).slice(0, 400);
+  const detail = parts.join(' - ') || (await res.text().catch(() => '')).slice(0, 400);
   throw new Error(`Heightmap fetch failed (${res.status}): ${detail}`);
 }
 
-// AWS Open Terrain Tiles (Terrarium format) — PNG tiles where RGB encodes
+// AWS Open Terrain Tiles (Terrarium format) - PNG tiles where RGB encodes
 // signed elevation in meters as: (R*256 + G + B/256) - 32768.
 // Free, no key, no rate limit, served from S3. Same tile-fetch pattern as
-// satellite imagery — goes through our /api/tile proxy.
+// satellite imagery - goes through our /api/tile proxy.
 async function fetchAwsTerrain(bounds) {
   const midLat = (bounds.north + bounds.south) / 2;
   const widthM = (bounds.east - bounds.west) * 111320 * Math.cos(midLat * Math.PI / 180);
 
   // Pick a zoom level so the bounds map to ~384 native pixels per side. Clamped
-  // to [10, 15] — z15 is the global max for Terrarium, z10 keeps tile counts
+  // to [10, 15] - z15 is the global max for Terrarium, z10 keeps tile counts
   // sane for huge captures.
   const mPerPxAtZ0 = 156543.03 * Math.cos(midLat * Math.PI / 180);
   const TARGET_NATIVE = 512;       // max useful for both display and 3D-printable mesh

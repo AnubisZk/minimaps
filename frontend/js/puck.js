@@ -6,7 +6,7 @@ import { computeBumpFromAlbedo, computeTextureIntensity, applyKuwahara, applySke
 // Physical sizing (units = cm, so 1 unit = 1 cm).
 const PUCK_SIZE = 10;            // 10 cm square footprint
 // MIN_THICKNESS is the printability floor: the puck is never thinner than this
-// at any (x, z) point — guarantees no paper-thin spots under terrain valleys.
+// at any (x, z) point - guarantees no paper-thin spots under terrain valleys.
 // The cross-section silhouette comes from the side walls following the terrain
 // above this floor (lowest elevation point sits at y=MIN_THICKNESS).
 const MIN_THICKNESS = 0.5;       // 5 mm
@@ -40,7 +40,7 @@ function ensureViewer(container) {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x15171a);
 
-  // IBL via a small procedural room — gives PBR materials a believable ambient
+  // IBL via a small procedural room - gives PBR materials a believable ambient
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
@@ -55,7 +55,7 @@ function ensureViewer(container) {
   controls.target.set(0, MIN_THICKNESS * 0.6, 0);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  // Pan is permanently disabled — for a single-object viewer it only causes
+  // Pan is permanently disabled - for a single-object viewer it only causes
   // problems (any pan moves the orbit target off-axis and autoRotate then
   // sweeps the puck through a circle instead of spinning in place). User
   // still gets rotate + zoom; pan is the one they don't need.
@@ -73,7 +73,7 @@ function ensureViewer(container) {
   rim.position.set(-8, 6, -10);
   scene.add(rim);
 
-  // Optional cool fill from opposite the sun. Off by default — toggled from
+  // Optional cool fill from opposite the sun. Off by default - toggled from
   // the filters panel. Acts as a studio "key + fill" pair, brightening the
   // shadow side without flattening the lit side.
   fillLight = new THREE.DirectionalLight(0xc0d4ff, 0.5);
@@ -82,7 +82,7 @@ function ensureViewer(container) {
   scene.add(fillLight);
 
   window.addEventListener('resize', () => resize(container));
-  // ResizeObserver picks up layout-driven size changes too — e.g. the
+  // ResizeObserver picks up layout-driven size changes too - e.g. the
   // filters sidebar opening/closing shrinks/grows the three-container.
   if (typeof ResizeObserver !== 'undefined') {
     const ro = new ResizeObserver(() => resize(container));
@@ -100,7 +100,7 @@ function resize(container) {
   applyCameraAspect(w / h);
 }
 
-// Set the active camera's aspect ratio — perspective uses .aspect, while
+// Set the active camera's aspect ratio - perspective uses .aspect, while
 // orthographic needs its left/right frustum bounds adjusted.
 function applyCameraAspect(aspect) {
   if (camera.isPerspectiveCamera) {
@@ -172,7 +172,7 @@ export function getViewer() {
   return { scene, camera, renderer, controls };
 }
 
-// Show/hide the puck mesh — used when an alternative view (Google 3D
+// Show/hide the puck mesh - used when an alternative view (Google 3D
 // tileset) temporarily takes over the scene.
 export function setPuckVisible(visible) {
   if (currentMesh) currentMesh.visible = visible;
@@ -181,7 +181,7 @@ export function setPuckVisible(visible) {
 // Show/hide ONLY the puck's terrain top surface (material group 0), keeping
 // the cream sides + base (material group 1) visible. Used by the Google 3D
 // view so we reuse the existing puck silhouette as the cup the tiles render
-// into — no separate shell geometry needed.
+// into - no separate shell geometry needed.
 export function setPuckTopVisible(visible) {
   if (!currentMesh) return;
   const mats = Array.isArray(currentMesh.material) ? currentMesh.material : [currentMesh.material];
@@ -217,7 +217,7 @@ function animate(nowMs) {
 
   // Push exactly one frame to the recording stream per rendered frame. This
   // pairs with captureStream(0) (manual-frame mode) so the WebM has perfect
-  // 1:1 timing with the render loop — no browser-side sampling jitter.
+  // 1:1 timing with the render loop - no browser-side sampling jitter.
   if (_exportTrack) _exportTrack.requestFrame();
 }
 
@@ -332,20 +332,20 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
   material.userData.waterHighlight = { value: new THREE.Color(0xeef4f4) }; // near-white foam
   material.userData.uTime          = { value: 0 };
   material.userData.uWaterEnabled  = { value: waterMaskCanvas ? 1 : 0 };
-  // Shore fade range — start where the shader appears (close to coast =
+  // Shore fade range - start where the shader appears (close to coast =
   // small value), end where it reaches full strength. Default mirrors the
   // previous hard-coded smoothstep(0.30, 0.85).
   material.userData.uShoreFadeStart = { value: 0.30 };
   material.userData.uShoreFadeEnd   = { value: 0.85 };
 
-  // Photo-style image adjustments — applied per-fragment after the texture
+  // Photo-style image adjustments - applied per-fragment after the texture
   // is sampled, before any water effects. Sliders just update the .value.
   material.userData.uBrightness    = { value: 0 };
   material.userData.uContrast      = { value: 1 };
   material.userData.uSaturation    = { value: 1 };
   material.userData.uSharpness     = { value: 0 };
 
-  // Surface bump — sampler + strength. We compute derivatives ourselves so
+  // Surface bump - sampler + strength. We compute derivatives ourselves so
   // we don't depend on three.js's bumpMap pipeline (which had been silently
   // failing with onBeforeCompile + late-bound bumpMap).
   material.userData.uBumpMap       = { value: getDummyWaterTex() };
@@ -391,7 +391,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
        uniform float uBumpStrength;
        uniform vec2 uTexelSize;
 
-       // 2D value noise — smooth, organic, no grid artifacts.
+       // 2D value noise - smooth, organic, no grid artifacts.
        float wh21(vec2 p) {
          p = fract(p * vec2(123.34, 456.21));
          p += dot(p, p + 78.91);
@@ -418,7 +418,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
       // === Image adjustments (brightness / contrast / saturation / sharpness) ===
       // Sharpness: unsharp mask. 5-tap (current + 4 neighbours), high-pass diff.
       // The sample offset is one SCREEN pixel (fwidth of the UV), not one
-      // source texel — the puck is displayed far smaller than the 4096px
+      // source texel - the puck is displayed far smaller than the 4096px
       // texture, so a 1-texel offset lands inside a single visible pixel and
       // the high-pass cancels to zero. Screen-pixel spacing makes the effect
       // operate at the scale actually being rasterised, so it's visible at
@@ -434,7 +434,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
       }
       // Brightness: midtone-weighted lift. The weight peaks at mid-grey and
       // tapers to zero at pure black/white, so highlights don't blow out and
-      // shadows don't crush — far more photo-like than a flat additive shift.
+      // shadows don't crush - far more photo-like than a flat additive shift.
       if (abs(uBrightness) > 0.0001) {
         diffuseColor.rgb += uBrightness * (1.0 - abs(2.0 * diffuseColor.rgb - 1.0));
       }
@@ -448,7 +448,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
         float s1 = 1.0 / (1.0 + exp(-k * 0.5));
         diffuseColor.rgb = (s - s0) / (s1 - s0);
       }
-      // Saturation: blend toward Rec.709 luma (correct sRGB weights — the old
+      // Saturation: blend toward Rec.709 luma (correct sRGB weights - the old
       // 0.299/0.587/0.114 set is Rec.601 / SD-video).
       float _lum = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
       diffuseColor.rgb = mix(vec3(_lum), diffuseColor.rgb, uSaturation);
@@ -461,7 +461,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
         float depthNorm = wsample.g;
 
         // Fully transparent at the immediate shore, ramps over a long
-        // feathered zone — 15% to 85% of the shore band — and reaches full
+        // feathered zone - 15% to 85% of the shore band - and reaches full
         // strength well offshore. The wide gradient hides any heightmap-mask
         // jaggedness and keeps near-shore detail (beaches, breakers,
         // shallow-water color) visible.
@@ -475,7 +475,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
         float n = wfbm(vMapUv * 5.0 + uTime * 0.015);
         wcol *= 0.97 + 0.04 * n;
 
-        // Gated by oceanFlag — lakes / rivers contribute nothing. Their
+        // Gated by oceanFlag - lakes / rivers contribute nothing. Their
         // satellite imagery shows through cleanly.
         diffuseColor.rgb = mix(diffuseColor.rgb, wcol, waterAmt * oceanFlag * 0.83 * shoreFade * uWaterEnabled);
       }
@@ -494,7 +494,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
       `
     );
 
-    // Animated wave normals — TWO noise layers at rotated angles & different
+    // Animated wave normals - TWO noise layers at rotated angles & different
     // scales. Rotation between layers is what kills the value-noise grid
     // alignment that made the surface look like fabric weave. Standard trick
     // from game-engine water shaders (two normal maps panning at angles).
@@ -503,7 +503,7 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
       `
       #include <normal_fragment_maps>
 
-      // === Surface bump — perturb normal from a precomputed grayscale bump
+      // === Surface bump - perturb normal from a precomputed grayscale bump
       // map. Derivatives computed in-shader so we don't depend on three.js's
       // bumpMap pipeline (which had been failing silently with onBeforeCompile).
       if (uBumpStrength > 0.001) {
@@ -520,11 +520,11 @@ function applyWaterShader(material, waterMaskCanvas, albedoCanvas) {
       float oceanFlag3 = ws3.b;
       float shoreFade3 = smoothstep(uShoreFadeStart, uShoreFadeEnd, ws3.g);
       if (waterAmt3 > 0.02 && oceanFlag3 > 0.02) {
-        // Layer A — rotated 25°, scale 95
+        // Layer A - rotated 25°, scale 95
         float a1 = 0.436; // 25°
         mat2 R1 = mat2(cos(a1), -sin(a1), sin(a1), cos(a1));
         vec2 uvA = R1 * vMapUv * 95.0 + vec2(uTime * 0.035, uTime * 0.022);
-        // Layer B — rotated -55°, scale 160
+        // Layer B - rotated -55°, scale 160
         float a2 = -0.960; // -55°
         mat2 R2 = mat2(cos(a2), -sin(a2), sin(a2), cos(a2));
         vec2 uvB = R2 * vMapUv * 160.0 + vec2(-uTime * 0.020, uTime * 0.041);
@@ -576,7 +576,7 @@ function buildPuckMesh(heightmap, albedoCanvas, zExag, bounds, waterMaskCanvas) 
   tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
   tex.needsUpdate = true;
 
-  // Fully matte — terrain seen from altitude has no gloss. roughness 1.0
+  // Fully matte - terrain seen from altitude has no gloss. roughness 1.0
   // spreads the specular lobe out to nothing, and the reduced envMapIntensity
   // stops dark albedo from picking up a reflective sheen off the IBL.
   const topMat = new THREE.MeshStandardMaterial({
@@ -585,7 +585,7 @@ function buildPuckMesh(heightmap, albedoCanvas, zExag, bounds, waterMaskCanvas) 
     metalness: 0.0,
     envMapIntensity: 0.45,
   });
-  // Always install the custom shader — even without a water mask we want the
+  // Always install the custom shader - even without a water mask we want the
   // image-adjustment + bump uniforms wired up. Water effects are gated by
   // uWaterEnabled so they stay invisible when no real mask is present.
   applyWaterShader(topMat, waterMaskCanvas, albedoCanvas);
@@ -624,7 +624,7 @@ function buildTerrainBoxGeometry({
   const half = size / 2;
 
   // Max displacement amplitude (cm) at slider = 1.0. The source map is a
-  // positive 0..1 "texture intensity" — forests / urban areas score high
+  // positive 0..1 "texture intensity" - forests / urban areas score high
   // (so they rise), water / fields / snow score near zero (stay flat).
   const DISP_MAX_CM = 0.55;
 
@@ -659,7 +659,7 @@ function buildTerrainBoxGeometry({
       const uvX = c / (ncols - 1);
       const uvY = r / (nrows - 1);
       const b = sampleBump(uvX, uvY);    // 0..1 texture intensity
-      // No centering — textured regions rise, smooth regions stay flat.
+      // No centering - textured regions rise, smooth regions stay flat.
       y += b * DISP_MAX_CM * displacement;
     }
     return y;
@@ -839,7 +839,7 @@ function getPresentBackground() {
   const c = document.createElement('canvas');
   c.width = 64; c.height = 512;
   const ctx = c.getContext('2d');
-  // Cool neutral "infinity backdrop" — lighter at top, darker at bottom, like
+  // Cool neutral "infinity backdrop" - lighter at top, darker at bottom, like
   // a photography studio's seamless paper curving from wall to floor. No warm
   // cast (yellow reads as "stock photo"), no pure white (reads as flat / boring).
   const g = ctx.createLinearGradient(0, 0, 0, 512);
@@ -896,7 +896,7 @@ export function enterPresentMode({ preserveCamera = false } = {}) {
   renderer.toneMappingExposure = 1.18;
 
   // Present mode is the default viewing state now (no workshop fallback), so
-  // the puck stays still by default — user grabs to orbit. The recorder still
+  // the puck stays still by default - user grabs to orbit. The recorder still
   // turns autoRotate on internally during exports.
   controls.autoRotate = false;
 
@@ -905,11 +905,11 @@ export function enterPresentMode({ preserveCamera = false } = {}) {
   const center = getPuckCenter();
   const size = getPuckSize();
   const radius = Math.max(size.x, size.z) * 0.5;
-  const d = radius * 2.31;         // tuned for the 40° FOV — 10% closer than previous
+  const d = radius * 2.31;         // tuned for the 40° FOV - 10% closer than previous
   const camPos = new THREE.Vector3(center.x + d, center.y + d * 0.85, center.z + d);
 
   // In orthographic mode the camera distance only sets the angle, not the
-  // apparent size — set the zoom to frame the puck (matches the perspective
+  // apparent size - set the zoom to frame the puck (matches the perspective
   // framing at distance d).
   if (camera.isOrthographicCamera) {
     const visibleHalfH = d * Math.tan(perspCamera.fov * Math.PI / 360);
@@ -1023,7 +1023,7 @@ export async function setStyle(name, onProgress) {
 }
 
 // Displacement uses a separate texture-intensity map (local stddev of
-// luminance, heavily smoothed) — not the high-pass bump map which is too
+// luminance, heavily smoothed) - not the high-pass bump map which is too
 // noisy for actual geometry. The bump canvas keeps catching light in the
 // shader; the displacement canvas decides where to raise vertices.
 function ensureDisplacementPixelData() {
@@ -1042,7 +1042,7 @@ function ensureDisplacementPixelData() {
   return ud.displacementPixelData;
 }
 
-// Single rebuild routine — reads current zExag + displacement off the mesh
+// Single rebuild routine - reads current zExag + displacement off the mesh
 // and constructs a new geometry. Both setZExaggeration and setDisplacement
 // route through here.
 function rebuildGeometry() {
@@ -1137,12 +1137,12 @@ function setupExportState(width, height, overlay) {
 
   // GUARANTEE the rotation axis is the puck's own volume centroid. Even
   // though pan is disabled globally, this is a hard belt-and-suspenders
-  // defence — every export starts on-axis no matter what.
+  // defence - every export starts on-axis no matter what.
   controls.target.copy(getPuckCenter());
   controls.update();
 
   // Disable damping for the export. With damping on, changing autoRotateSpeed
-  // makes the rotation ramp up over ~12 frames — the recording would start
+  // makes the rotation ramp up over ~12 frames - the recording would start
   // slow, never complete a clean 360°, and the loop wouldn't seam. Off, the
   // rotation is perfectly uniform from the first frame.
   controls.enableDamping = false;
@@ -1228,7 +1228,7 @@ function restoreExportState(state) {
   controls.update();
 }
 
-// PNG snapshot — renders main scene + (optional) overlay into the WebGL
+// PNG snapshot - renders main scene + (optional) overlay into the WebGL
 // canvas, then reads it as a data URL.
 export function captureSnapshotPNG({ width = 1440, height = 1080, overlay } = {}) {
   if (!renderer || !scene || !camera) return null;
@@ -1256,10 +1256,10 @@ export function captureSnapshotPNG({ width = 1440, height = 1080, overlay } = {}
 //
 // Important: the profile/level code must permit the output resolution. We
 // render at 1440×1080, which requires AT LEAST Level 4.0. Earlier we picked
-// Baseline 3.1 (avc1.42E01F) which caps at 720p — the encoder produced
+// Baseline 3.1 (avc1.42E01F) which caps at 720p - the encoder produced
 // garbage frames silently. The codes below all cover 1080p properly.
 const VIDEO_MIME_PREFERENCE = [
-  'video/mp4;codecs=avc1.640028',   // H.264 High @ Level 4.0 — best quality
+  'video/mp4;codecs=avc1.640028',   // H.264 High @ Level 4.0 - best quality
   'video/mp4;codecs=avc1.4D4028',   // H.264 Main @ Level 4.0
   'video/mp4;codecs=avc1.42E028',   // H.264 Baseline @ Level 4.0
   'video/mp4',
@@ -1304,7 +1304,7 @@ export async function recordRotation({ durationSec = 8, width = 1440, height = 1
     stream = renderer.domElement.captureStream(0);
     track = stream.getVideoTracks()[0];
     if (typeof track?.requestFrame !== 'function') {
-      // Browser doesn't support requestFrame at all — fall back to steady.
+      // Browser doesn't support requestFrame at all - fall back to steady.
       stream.getTracks().forEach(t => t.stop());
       stream = renderer.domElement.captureStream(60);
       track = null;
@@ -1334,7 +1334,7 @@ export async function recordRotation({ durationSec = 8, width = 1440, height = 1
     await new Promise(r => requestAnimationFrame(r));
   }
 
-  // Hand the track to the animate loop — it'll push a frame each render.
+  // Hand the track to the animate loop - it'll push a frame each render.
   if (manual) _exportTrack = track;
 
   const startMs = performance.now();

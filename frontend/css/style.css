@@ -24,12 +24,12 @@
   --btn-secondary:        #ebe6dc;
   --btn-secondary-hover:  #ddd6c4;
 
-  /* Crisper card shadows — used on gallery items + modal */
+  /* Crisper card shadows - used on gallery items + modal */
   --shadow-soft:    0 1px 2px rgba(60, 50, 30, 0.04), 0 4px 14px rgba(60, 50, 30, 0.06);
   --shadow-medium:  0 2px 6px rgba(60, 50, 30, 0.06), 0 12px 28px rgba(60, 50, 30, 0.12);
   --shadow-strong:  0 8px 28px rgba(60, 50, 30, 0.14);
 
-  /* Typography — Inter for everything UI-side. */
+  /* Typography - Inter for everything UI-side. */
   --font-ui: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -89,7 +89,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .view.active { display: block; }
 
 /* === Gallery (startup screen) === */
-/* Gallery view replaces the sidebar entirely — it IS the library, at full
+/* Gallery view replaces the sidebar entirely - it IS the library, at full
    scale. Sidebar comes back when the user enters map or puck view. */
 body.view-gallery #library { display: none; }
 
@@ -134,7 +134,7 @@ body.view-gallery #library { display: none; }
   max-width: 480px;
 }
 
-/* First-run banner — appears at the top of the gallery on first visit to
+/* First-run banner - appears at the top of the gallery on first visit to
    explain that the default DEM (Copernicus) needs a free OpenTopo key.
    Dismissed forever once the user takes any action (gets key / pastes
    key / explicitly dismisses). */
@@ -200,7 +200,7 @@ body.view-gallery #library { display: none; }
   margin: 0 auto;
 }
 
-/* === "Create new puck" tile — first card in the grid ===
+/* === "Create new puck" tile - first card in the grid ===
    Dashed accent border by default (reads as "add new" affordance), flips to
    filled solid accent with white text on hover (reads as "go" call to action).
    Sized to match gallery-card via aspect-ratio on the icon area + matching
@@ -315,7 +315,7 @@ body.view-gallery #library { display: none; }
 #map-controls label, #puck-controls label { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
 #map-controls select, #map-controls input { background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-medium); border-radius: 4px; padding: 4px 6px; font-size: 12px; }
 
-/* OpenTopography key dialog — modal sheet over the map. */
+/* OpenTopography key dialog - modal sheet over the map. */
 #opentopo-key-dialog {
   position: absolute; inset: 0; z-index: 1500;
   background: rgba(40, 35, 22, 0.35); backdrop-filter: blur(3px);
@@ -342,7 +342,7 @@ body.view-gallery #library { display: none; }
   display: flex; gap: 8px; align-items: center; margin-top: 12px;
 }
 
-/* Experimental drop-up menu — sits above the puck-controls bar, click-out closes. */
+/* Experimental drop-up menu - sits above the puck-controls bar, click-out closes. */
 #experimental-menu {
   position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
   background: rgba(255,255,255,0.96); border: 1px solid var(--border-soft); border-radius: 8px;
@@ -390,7 +390,7 @@ body.view-gallery #library { display: none; }
 #experimental-menu .exp-link:hover { text-decoration: underline; }
 #experimental-menu .exp-link.disabled { color: var(--text-tertiary); cursor: default; pointer-events: none; }
 
-/* About button — discreet bottom-right link, always visible. Opens the
+/* About button - discreet bottom-right link, always visible. Opens the
    credits modal. Light-on-warm to match the rest of the app rather than
    the previous dark-glassmorphic look. */
 .about-btn {
@@ -414,7 +414,7 @@ body.view-gallery #library { display: none; }
   transform: translateY(-1px);
 }
 
-/* About modal — credits, licence framing, third-party attributions. */
+/* About modal - credits, licence framing, third-party attributions. */
 #about-modal {
   position: fixed; inset: 0; z-index: 5000;
   background: rgba(20,22,28,0.55); backdrop-filter: blur(6px);
@@ -521,7 +521,7 @@ body.view-gallery #library { display: none; }
 
 #map-info { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.92); padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--text-secondary); z-index: 1000; display: flex; gap: 12px; align-items: center; border: 1px solid var(--border-soft); box-shadow: var(--shadow-soft); backdrop-filter: blur(8px); }
 
-/* Real right-hand sidebar (sibling of #stage in #app) — no longer overlays
+/* Real right-hand sidebar (sibling of #stage in #app) - no longer overlays
    the model area. JS promotes the element on load. */
 #filters-panel { position: relative; width: 340px; flex-shrink: 0; background: var(--bg-surface); border-left: 1px solid var(--border-soft); padding: 16px 18px; overflow-y: auto; box-shadow: -8px 0 24px rgba(60,50,30,0.08); }
 #filters-panel[hidden] { display: none; }

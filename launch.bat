@@ -1,5 +1,5 @@
 @echo off
-REM Minimap Maker — double-click to run. Starts the local server and opens
+REM Minimap Maker - double-click to run. Starts the local server and opens
 REM your browser. Requires Python 3 with Flask installed:
 REM     pip install -r requirements.txt
 

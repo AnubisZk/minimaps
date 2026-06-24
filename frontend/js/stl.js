@@ -1,4 +1,4 @@
-// 3D model exporters — STL for 3D printing, OBJ for editors (Blender/Maya/etc),
+// 3D model exporters - STL for 3D printing, OBJ for editors (Blender/Maya/etc),
 // GLB for textured-3D distribution (web, Unity, Unreal, Blender import).
 
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';
@@ -31,7 +31,7 @@ export function exportOBJ(puck, name) {
 }
 
 // GLB is the binary glTF container. Includes geometry, materials, AND the
-// embedded texture (albedo) — recipients get a fully self-contained model
+// embedded texture (albedo) - recipients get a fully self-contained model
 // that opens in any glTF-capable viewer / engine.
 export function exportGLB(puck, name) {
   const exporter = new GLTFExporter();

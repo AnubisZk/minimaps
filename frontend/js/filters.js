@@ -42,7 +42,7 @@ export function computeBumpFromAlbedo(srcCanvas, opts = {}) {
   return out;
 }
 
-// XDoG (Extended Difference of Gaussians) — classic pencil-sketch / inked
+// XDoG (Extended Difference of Gaussians) - classic pencil-sketch / inked
 // line-art filter. Subtracts two gaussian-blurred copies at different scales
 // to isolate edges, then soft-thresholds.
 export function applySketch(srcCanvas, opts = {}) {
@@ -81,7 +81,7 @@ export function applySketch(srcCanvas, opts = {}) {
   return out;
 }
 
-// Tritone — map image luminance through three colors (shadow / mid / highlight).
+// Tritone - map image luminance through three colors (shadow / mid / highlight).
 // Gives every puck a strong unified palette. Default is a warm "old-map" look.
 export function applyTritone(srcCanvas, opts = {}) {
   const shadow    = opts.shadow    ?? [38, 50, 70];
@@ -122,7 +122,7 @@ export function applyTritone(srcCanvas, opts = {}) {
 
 // Topographic contour overlay. Traces elevation iso-lines from the heightmap
 // via marching squares and draws them over a lightly-washed copy of the
-// albedo. Every 5th line is an "index contour" — thicker & darker, just like
+// albedo. Every 5th line is an "index contour" - thicker & darker, just like
 // a real topo map.
 export function applyContours(srcCanvas, heightmap, opts = {}) {
   const w = srcCanvas.width, h = srcCanvas.height;
@@ -164,7 +164,7 @@ export function applyContours(srcCanvas, heightmap, opts = {}) {
   return out;
 }
 
-// Marching squares — appends contour line segments at `threshold` into the
+// Marching squares - appends contour line segments at `threshold` into the
 // current ctx path. Standard 16-case lookup with linear edge interpolation.
 function marchingSquares(values, ncols, nrows, threshold, ctx, cellW, cellH) {
   const lerpT = (a, b) => (a === b ? 0.5 : (threshold - a) / (b - a));
@@ -204,7 +204,7 @@ function marchingSquares(values, ncols, nrows, threshold, ctx, cellW, cellH) {
   }
 }
 
-// Watercolor — smoothed colour "washes", pigment darkening pooling at edges,
+// Watercolor - smoothed colour "washes", pigment darkening pooling at edges,
 // a saturation lift, and fine paper grain. Downsamples large albedos first
 // (the multi-channel gaussian is too heavy at full 4096² resolution, and the
 // stylized result doesn't need that detail anyway).
@@ -332,7 +332,7 @@ function separableGaussian(src, w, h, sigma) {
 // luminance over a sliding window, then smooths the result heavily so the
 // output describes "how textured is this region" rather than individual
 // pixel variation. Forests / urban areas come out bright, water / fields /
-// snow stay dark. The grayscale canvas is suitable for vertex displacement —
+// snow stay dark. The grayscale canvas is suitable for vertex displacement -
 // brighter values raise the surface.
 export function computeTextureIntensity(srcCanvas, opts = {}) {
   const varRadius    = opts.varRadius    ?? 14;   // local variance window
@@ -418,7 +418,7 @@ function separableBoxBlur(src, w, h, radius) {
   return out;
 }
 
-// Generalized Kuwahara filter — 8 angular sectors around each pixel, output is
+// Generalized Kuwahara filter - 8 angular sectors around each pixel, output is
 // the mean of the lowest-variance sector. Preserves edges while flattening
 // uniform regions into "brushstroke" patches, giving a painterly look.
 //

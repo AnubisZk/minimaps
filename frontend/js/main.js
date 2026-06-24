@@ -4,7 +4,7 @@ const MIN_REGION_M = 800;
 const MAX_REGION_M = 30000;
 
 // Seconds for one full rotation in the exported WebM. Higher = slower, more
-// graceful spin. This is the single knob — change it and the recording length
+// graceful spin. This is the single knob - change it and the recording length
 // + rotation speed both follow. (~24 s reads as a calm showcase rotation.)
 const WEBM_ROTATION_SECONDS = 32;
 import { createPuck, enterPresentMode, exitPresentMode, setWaterShader, setWaterShoreFade, setSurfaceBumpStrength, setImageAdjust, setStyle, setZExaggeration, setCameraMode, getCameraMode, setPuckAlbedo, getFilterState, captureSnapshotPNG, recordRotation, getRecordingFileExtension, getPuckGeoParams, setBuildingsGroup, hasBuildings, clearBuildings, setFillLight } from './puck.js';
@@ -35,7 +35,7 @@ function setBusy(msg) {
   }
 }
 
-// Lightweight transient notification — bottom-centre, auto-dismisses. Used
+// Lightweight transient notification - bottom-centre, auto-dismisses. Used
 // for non-blocking heads-ups (e.g. DEM fallback) that shouldn't hijack the
 // busy spinner. Creates its element lazily so no HTML/CSS dependency.
 let _toastTimer = null;
@@ -63,7 +63,7 @@ function flashToast(msg, ms = 3500) {
 // Showroom = the only viewing state for a puck now. Apply the present-mode
 // styling (gradient background, no grid, shadow disc, exposure boost), drop
 // the on-screen caption and the export viewfinder, and leave the user's
-// orbit/zoom untouched. Auto-rotate is off — the puck sits still until they
+// orbit/zoom untouched. Auto-rotate is off - the puck sits still until they
 // grab it.
 function enterShowroom() {
   enterPresentMode({ preserveCamera: true });
@@ -88,7 +88,7 @@ function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $(name + '-view').classList.add('active');
 
-  // Body class so CSS can react to which view is showing — e.g. the gallery
+  // Body class so CSS can react to which view is showing - e.g. the gallery
   // hides the library sidebar (it IS the library, at full size).
   document.body.classList.remove('view-gallery', 'view-map', 'view-puck');
   document.body.classList.add('view-' + name);
@@ -103,13 +103,13 @@ function switchView(name) {
 
 // Promote the filters panel out of #puck-view to become a real flex sibling
 // of #stage in #app. With flexbox it then shrinks the stage when open instead
-// of overlaying the canvas. The DOM move is purely cosmetic — IDs and event
+// of overlaying the canvas. The DOM move is purely cosmetic - IDs and event
 // listeners survive.
 document.getElementById('app').appendChild($('filters-panel'));
 
 state.map = setupMap('map');
 
-// Filters panel — toggle on button click, explicit close via × button. No
+// Filters panel - toggle on button click, explicit close via × button. No
 // auto-close on outside click so the panel can stay open while inspecting
 // the puck.
 $('filters-btn').addEventListener('click', () => {
@@ -140,7 +140,7 @@ $('water-feather').addEventListener('input', (e) => {
   applyWaterShoreSettings();
 });
 
-// OpenTopography key dialog — opened either from the explicit button in the
+// OpenTopography key dialog - opened either from the explicit button in the
 // map controls, or automatically when /api/heightmap rejects a request for
 // lack of a key.
 function openOpentopoKeyDialog(message) {
@@ -154,7 +154,7 @@ function openOpentopoKeyDialog(message) {
 }
 function closeOpentopoKeyDialog() { $('opentopo-key-dialog').hidden = true; }
 
-// Map-screen button — lets users add/change their OpenTopo key any time, in
+// Map-screen button - lets users add/change their OpenTopo key any time, in
 // case they skipped the first-run banner. Opens the same dialog.
 $('opentopo-key-btn').addEventListener('click', () => {
   openOpentopoKeyDialog('Paste your free OpenTopography API key here');
@@ -198,7 +198,7 @@ $('frb-dismiss').addEventListener('click', () => {
   refreshFirstRunBanner();
 });
 
-// Fill light — scene-level preference (NOT a per-puck filter). Persists in
+// Fill light - scene-level preference (NOT a per-puck filter). Persists in
 // localStorage so it survives page reloads and applies to every puck loaded
 // this session without needing to be on each one's saved state.
 const FILL_LIGHT_KEY = 'minimap_fill_light';
@@ -222,7 +222,7 @@ $('camera-toggle-btn').addEventListener('click', () => {
 
 // ===== Experimental panel =====
 // Drop-up menu (same pattern as #share-menu) housing features that are still
-// rough around the edges — currently OSM building overlays with optional
+// rough around the edges - currently OSM building overlays with optional
 // satellite-texture projection. Click-outside closes it.
 
 $('experimental-btn').addEventListener('click', (e) => {
@@ -310,13 +310,13 @@ $('exp-buildings-walls-offwhite').addEventListener('change', async () => {
 });
 
 $('exp-buildings-reload').addEventListener('click', async () => {
-  // Reload re-uses the cached Overpass response — purpose is to re-seat the
+  // Reload re-uses the cached Overpass response - purpose is to re-seat the
   // extrusions on the current terrain (after a Z-exag change), not to re-pull
   // data. Hold Shift while clicking to force-refetch.
   await rebuildBuildings({ forceRefetch: false });
 });
 
-// Photo sliders — instant GPU uniform updates, no re-processing.
+// Photo sliders - instant GPU uniform updates, no re-processing.
 function wireSlider(id, valId, fmt, apply) {
   const el = $(id), valEl = $(valId);
   el.addEventListener('input', (e) => {
@@ -386,11 +386,11 @@ function updateRegionStatus() {
   if (w < MIN_REGION_M) {
     square.dataset.state = 'too-small';
     captureBtn.disabled = true;
-    captureBtn.title = `Region too small — minimum ${MIN_REGION_M} m. Zoom out.`;
+    captureBtn.title = `Region too small - minimum ${MIN_REGION_M} m. Zoom out.`;
   } else if (w > MAX_REGION_M) {
     square.dataset.state = 'too-large';
     captureBtn.disabled = true;
-    captureBtn.title = `Region too large — maximum ${MAX_REGION_M / 1000} km. Zoom in.`;
+    captureBtn.title = `Region too large - maximum ${MAX_REGION_M / 1000} km. Zoom in.`;
   } else {
     square.dataset.state = 'ok';
     captureBtn.disabled = false;
@@ -452,7 +452,7 @@ $('resolution-select').addEventListener('change', async (e) => {
     // mostly black. Detect that and roll back rather than wrecking the puck.
     const blackFrac = estimateBlackFraction(albedo);
     if (blackFrac > 0.5) {
-      flashToast(`z${newZoom} has little/no imagery here (${Math.round(blackFrac * 100)}% blank) — kept z${prevZoom}.`);
+      flashToast(`z${newZoom} has little/no imagery here (${Math.round(blackFrac * 100)}% blank) - kept z${prevZoom}.`);
       sel.value = String(prevZoom);
       return;
     }
@@ -473,7 +473,7 @@ $('resolution-select').addEventListener('change', async (e) => {
 });
 
 // Sample a coarse grid of the albedo canvas and report the fraction of pixels
-// that are near-black — a proxy for "missing tiles". Cheap (samples ~400 px).
+// that are near-black - a proxy for "missing tiles". Cheap (samples ~400 px).
 function estimateBlackFraction(canvas) {
   try {
     const ctx = canvas.getContext('2d');
@@ -491,7 +491,7 @@ function estimateBlackFraction(canvas) {
     }
     return total ? black / total : 0;
   } catch {
-    return 0;   // cross-origin or other read failure — don't block the change
+    return 0;   // cross-origin or other read failure - don't block the change
   }
 }
 
@@ -568,7 +568,7 @@ function pickZoomFromBoundingbox(bb) {
   return Math.max(3, Math.min(18, Math.round(z)));
 }
 
-// Post-capture geometry sliders — each rebuilds the puck mesh in place.
+// Post-capture geometry sliders - each rebuilds the puck mesh in place.
 $('puck-zexag').addEventListener('input', (e) => {
   const v = parseFloat(e.target.value);
   $('puck-zexag-val').textContent = v.toFixed(2) + '×';
@@ -593,7 +593,7 @@ $('back-btn').addEventListener('click', () => switchView('map'));
 
 $('capture-btn').addEventListener('click', async () => {
   // Copernicus DEM is served via OpenTopography and needs a free per-user
-  // API key. Only prompt when Copernicus is the selected source — AWS
+  // API key. Only prompt when Copernicus is the selected source - AWS
   // Terrain Tiles needs no key. Saves the user from a pointless dialog if
   // they've already chosen the keyless option.
   const demtype = $('dem-select').value;
@@ -621,7 +621,7 @@ $('capture-btn').addEventListener('click', async () => {
     $('export-filename').value = '';   // re-prefills from the new puck on menu open
     const zExag = 1.0;
     setBusy('Stitching satellite tiles…');
-    // Resolution is now a post-capture control — capture always uses the
+    // Resolution is now a post-capture control - capture always uses the
     // default +3× zoom; the user refines it afterward without re-querying DEM.
     const result = await capture(state.map, $('capture-square'), demtype, (m) => setBusy(m));
     result.center = {
@@ -668,7 +668,7 @@ $('capture-btn').addEventListener('click', async () => {
   }
 });
 
-// Export viewfinder — visible in showroom view, shows the 4:3 region that
+// Export viewfinder - visible in showroom view, shows the 4:3 region that
 // Share → Image / Record will capture so the user can frame the puck.
 const EXPORT_ASPECT = 4 / 3;
 function updateViewfinderSize() {
@@ -730,7 +730,7 @@ $('save-btn').addEventListener('click', async () => {
   }
 });
 
-// Human-readable name suggestion for the Save prompt — distinct from
+// Human-readable name suggestion for the Save prompt - distinct from
 // slugName() (which produces a filename-safe slug for exports). Same input
 // signal: prefer the user's saved name, then the reverse-geocoded locality,
 // then coordinates. Returns null if there's nothing useful to suggest so
@@ -809,7 +809,7 @@ function downloadDataURL(dataURL, filename) {
 
 // Builds a draw-callback that paints the present-mode caption onto an
 // arbitrary canvas2d context at any size. Mirrors the HTML layout in
-// #present-caption / .pc-* — name (light sans), 32 px rule, then label/value
+// #present-caption / .pc-* - name (light sans), 32 px rule, then label/value
 // rows in small-caps + monospace.
 function buildCaptionOverlay() {
   const puck = state.currentPuck;
@@ -866,7 +866,7 @@ function drawCaptionOnCanvas(ctx, size, name, rows) {
   ctx.fillRect(x0, y, px(32), ruleHeight);
   y += ruleHeight + ruleBottomGap;
 
-  // Meta rows — label small-caps, value monospace, baseline-aligned per row
+  // Meta rows - label small-caps, value monospace, baseline-aligned per row
   ctx.textBaseline = 'middle';
   for (const [label, value] of rows) {
     const yMid = y + rowHeight / 2;
@@ -907,7 +907,7 @@ $('share-btn').addEventListener('click', (e) => {
     copyBtn.textContent = 'Copy to clipboard';
     copyBtn.disabled = false;
     // Pre-fill the filename field with the puck's current name each time the
-    // menu opens — but don't clobber an edit the user already made this session.
+    // menu opens - but don't clobber an edit the user already made this session.
     const fn = $('export-filename');
     if (fn && !fn.value.trim()) fn.value = slugName();
   }
@@ -953,7 +953,7 @@ $('share-menu').addEventListener('click', async (e) => {
     if (!dataURL) { alert('Snapshot failed'); return; }
     downloadDataURL(dataURL, exportBaseName() + '.png');
   } else if (action === 'video') {
-    // The puck view is already in showroom styling — just record from the
+    // The puck view is already in showroom styling - just record from the
     // user's current orbit/zoom. autoRotate is flipped on inside the recorder.
     try {
       setBusy(`Recording 0 / ${WEBM_ROTATION_SECONDS} s…`);
@@ -968,7 +968,7 @@ $('share-menu').addEventListener('click', async (e) => {
       // saved file has the matching extension.
       const ext = getRecordingFileExtension(blob.type);
       if (ext === 'webm') {
-        flashToast('Your browser does not support MP4 recording — saved as WebM. Twitter / X may reject it.', 6000);
+        flashToast('Your browser does not support MP4 recording - saved as WebM. Twitter / X may reject it.', 6000);
       }
       setBusy(`Encoding ${ext.toUpperCase()}…`);
       downloadBlob(blob, exportBaseName() + '.' + ext);
@@ -1144,7 +1144,7 @@ async function renderLibrary() {
   }
 }
 
-// Gallery grid — large cards over the dark library sidebar. The first tile
+// Gallery grid - large cards over the dark library sidebar. The first tile
 // is always a "+ Create new puck" card styled distinctly so the primary
 // action lives in the grid's top-left where the eye lands first. Reuses
 // loadLibrary so it stays in lock-step with the sidebar.
@@ -1185,7 +1185,7 @@ async function renderGallery() {
       <button class="del-btn" title="Delete puck" aria-label="Delete">×</button>
       <img src="${item.thumbnail}" alt="">
       <div class="name">${escapeHtml(item.name)}</div>
-      <div class="meta">${escapeHtml(loc || '—')}</div>
+      <div class="meta">${escapeHtml(loc || '-')}</div>
       <div class="meta">${dt.toLocaleDateString()} · ${item.data.demtype}</div>
     `;
     card.querySelector('.del-btn').addEventListener('click', (e) => {
@@ -1203,7 +1203,7 @@ renderLibrary();
 // sees its previous state even before they capture a puck).
 $('filter-fill-light').checked = localStorage.getItem(FILL_LIGHT_KEY) === 'on';
 
-// About modal — credits + attributions. Lives on the gallery view as a
+// About modal - credits + attributions. Lives on the gallery view as a
 // discreet bottom-right button. Public users land on the gallery first so
 // they always have one click to see what data sources we depend on.
 $('about-btn').addEventListener('click', () => { $('about-modal').hidden = false; });
