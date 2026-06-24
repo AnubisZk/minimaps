@@ -1,0 +1,24 @@
+# Environment / secrets — NEVER commit these
+.env
+.env.local
+.env.*.local
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+
+# Overpass / OSM response cache (regenerated on demand from public APIs)
+backend/cache/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

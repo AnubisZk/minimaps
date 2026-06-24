@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minimap Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+        "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+        "3d-tiles-renderer": "https://esm.sh/3d-tiles-renderer@0.3?external=three",
+        "3d-tiles-renderer/plugins": "https://esm.sh/3d-tiles-renderer@0.3/plugins?external=three"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <aside id="library">
+      <h1 class="library-wordmark">Minimap Maker</h1>
+      <button id="new-puck-btn">+ New Puck</button>
+      <h2>Library</h2>
+      <div id="library-list"></div>
+    </aside>
+
+    <main id="stage">
+      <section id="gallery-view" class="view active">
+        <header class="gallery-header">
+          <div class="gallery-header-left">
+            <h1 class="gallery-title">Minimap Maker</h1>
+            <p class="gallery-tagline">Frame any spot on Earth and capture it.</p>
+          </div>
+          <div class="gallery-header-right" id="gallery-meta"></div>
+        </header>
+
+        <!-- First-run notice: only shown until the user either provides an
+             OpenTopography key, dismisses it, or switches to AWS Terrain. -->
+        <div id="first-run-banner" class="first-run-banner" hidden>
+          <div class="frb-text">
+            <strong>Heads up — Copernicus DEM needs a free OpenTopography key.</strong>
+            It's the default elevation source for the sharpest detail. AWS
+            Terrain works keyless if you'd rather skip the signup.
+          </div>
+          <div class="frb-actions">
+            <a href="https://portal.opentopography.org/login" target="_blank" rel="noopener" class="frb-link">Get a free key →</a>
+            <button id="frb-paste" class="frb-btn">I have a key, paste it</button>
+            <button id="frb-dismiss" class="frb-btn frb-btn-ghost" title="Hide this notice">Dismiss</button>
+          </div>
+        </div>
+
+        <div class="gallery-grid" id="gallery-grid"></div>
+      </section>
+
+      <!-- About button lives outside the per-view sections so it stays visible
+           on every view (gallery, map, puck). Positioned via .about-btn CSS. -->
+      <button id="about-btn" class="about-btn" title="About Minimap Maker & data attribution">About</button>
+
+      <div id="about-modal" hidden>
+        <div class="about-modal-inner">
+          <button id="about-close" class="about-close" aria-label="Close">×</button>
+          <h2>Minimap Maker</h2>
+          <p class="about-byline">By <a href="https://x.com/ShutterCG" target="_blank" rel="noopener">Mike</a></p>
+          <p class="about-desc">
+            Terrain pucks of any spot on Earth. Open source, non-commercial,
+            built for tinkerers.
+          </p>
+          <h3>Data sources</h3>
+          <ul class="about-credits">
+            <li><strong>Elevation</strong> — Copernicus DEM (ESA, free for personal use), NASA SRTM, JAXA AW3D, AWS Terrain Tiles. Served via <a href="https://opentopography.org" target="_blank" rel="noopener">OpenTopography</a> where applicable.</li>
+            <li><strong>Satellite imagery</strong> — Esri World Imagery (© Esri, Maxar, Earthstar Geographics).</li>
+            <li><strong>Map / buildings / water</strong> — © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, via the Overpass API.</li>
+            <li><strong>Place names</strong> — <a href="https://nominatim.org" target="_blank" rel="noopener">Nominatim</a> reverse geocoding.</li>
+            <li><strong>3D engine</strong> — <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>.</li>
+            <li><strong>Built with</strong> — <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude</a> (Anthropic).</li>
+          </ul>
+          <p class="about-fineprint">
+            Pucks are derived works of the above sources. If you redistribute
+            them, follow each provider's licence terms.
+          </p>
+          <p class="about-support">
+            Enjoy Minimap Maker? <a href="https://ko-fi.com/mike101441" target="_blank" rel="noopener">Buy me a coffee on Ko-fi ☕</a>
+          </p>
+        </div>
+      </div>
+
+      <section id="map-view" class="view">
+        <div id="map"></div>
+        <div id="map-overlay"><div id="capture-square"></div></div>
+        <div id="map-controls">
+          <label class="dem-label">Elevation
+            <select id="dem-select">
+              <option value="COP30" selected>Copernicus DEM 30m (needs OpenTopo key)</option>
+              <option value="aws-terrain">AWS Terrain (no key, global)</option>
+            </select>
+          </label>
+          <button id="capture-btn">Capture</button>
+        </div>
+        <div id="opentopo-key-dialog" hidden>
+          <div class="key-dialog-inner">
+            <h3>OpenTopography API key</h3>
+            <p>
+              Copernicus DEM is served via
+              <a href="https://opentopography.org" target="_blank" rel="noopener">OpenTopography</a>,
+              which needs a free API key. Sign up, copy your key, and paste it
+              here. It's stored only in your browser.
+            </p>
+            <p class="key-dialog-tip">
+              Prefer no signup? Switch the <strong>Elevation</strong> dropdown
+              to <strong>AWS Terrain</strong> — it's keyless and global.
+            </p>
+            <input type="text" id="opentopo-key-input" placeholder="Paste your key here" autocomplete="off" spellcheck="false">
+            <div class="key-dialog-actions">
+              <button id="opentopo-key-clear" class="secondary">Clear saved key</button>
+              <span style="flex:1"></span>
+              <button id="opentopo-key-cancel" class="secondary">Cancel</button>
+              <button id="opentopo-key-save">Save</button>
+            </div>
+          </div>
+        </div>
+        <div id="map-search">
+          <input type="search" id="search-input" placeholder="Search a place…" autocomplete="off">
+          <div id="search-results" hidden></div>
+        </div>
+        <div id="map-info">
+          <span id="region-status"><span id="region-width">—</span></span>
+          <span id="map-info-tip">Pan and zoom to frame the square.</span>
+        </div>
+      </section>
+
+      <section id="puck-view" class="view">
+        <div id="three-container"></div>
+        <div id="export-viewfinder" hidden>
+          <div class="export-frame">
+            <span class="export-frame-label">Export frame · 4 : 3</span>
+          </div>
+        </div>
+        <div id="present-caption" hidden></div>
+        <div id="puck-controls">
+          <button id="back-btn" class="secondary">← Back</button>
+          <button id="filters-btn" class="secondary">Filters</button>
+          <button id="camera-toggle-btn" class="secondary">Perspective</button>
+          <button id="experimental-btn" class="secondary" title="Experimental features (OSM buildings overlay, etc.)">Experimental</button>
+          <button id="save-btn">Save</button>
+          <button id="share-btn" class="secondary">Export ▾</button>
+        </div>
+        <div id="experimental-menu" hidden>
+          <div class="exp-header">Experimental</div>
+          <div class="exp-section">
+            <div class="exp-section-label">OSM building overlay</div>
+            <label class="exp-row">
+              <input type="checkbox" id="exp-buildings-enable">
+              <span>Show buildings</span>
+            </label>
+            <label class="exp-row exp-row-indent">
+              <input type="checkbox" id="exp-buildings-project" checked>
+              <span>Project satellite onto buildings</span>
+            </label>
+            <label class="exp-row exp-row-indent">
+              <input type="checkbox" id="exp-buildings-walls-offwhite" checked>
+              <span>Off-white walls (textured roof only)</span>
+            </label>
+            <button id="exp-buildings-reload" class="exp-button" title="Re-fit buildings to the current terrain (use after changing Z-exaggeration)">↻ Reload buildings</button>
+          </div>
+        </div>
+        <div id="share-menu" hidden>
+          <div class="share-section">
+            <div class="share-section-label">Social caption</div>
+            <div id="share-caption" class="share-caption"></div>
+            <button id="share-copy-btn" class="share-copy-btn">Copy to clipboard</button>
+          </div>
+          <div class="share-divider"></div>
+          <label class="share-filename-row">
+            <span class="share-filename-label">Filename</span>
+            <input type="text" id="export-filename" class="share-filename-input" autocomplete="off" spellcheck="false" placeholder="minimap-puck">
+          </label>
+          <button data-share="image">Save image (PNG)</button>
+          <button data-share="video">Record rotation (MP4)</button>
+          <button data-share="stl">STL — solid mesh</button>
+          <button data-share="glb">GLB — textured 3D model</button>
+          <button data-share="obj">OBJ — editor-friendly mesh</button>
+        </div>
+        <div id="filters-panel" hidden>
+          <button id="filters-close" class="filters-close-btn" aria-label="Close">×</button>
+
+          <h3>Texture source</h3>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info">
+              <div class="filter-name">Resolution</div>
+              <div class="filter-desc">Re-fetch the satellite imagery at a sharper zoom. Elevation data is untouched.</div>
+            </div>
+            <select id="resolution-select" class="filter-select"></select>
+          </div>
+          <h3>Style</h3>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info">
+              <div class="filter-desc">Stylized re-renderings of the satellite imagery. Cached after first compute.</div>
+            </div>
+            <select id="filter-style" class="filter-select">
+              <option value="none">Original</option>
+              <option value="contours">Topographic contours</option>
+              <option value="watercolor">Watercolor</option>
+              <option value="painterly">Painterly (Kuwahara)</option>
+              <option value="sketch">Pencil sketch (XDoG)</option>
+              <option value="tritone">Tritone</option>
+            </select>
+          </div>
+
+          <h3>Image</h3>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info"><div class="filter-name">Brightness</div></div>
+            <div class="slider-row">
+              <input type="range" id="img-brightness" min="-0.5" max="0.5" step="0.01" value="0">
+              <span id="img-brightness-val">0</span>
+            </div>
+          </div>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info"><div class="filter-name">Contrast</div></div>
+            <div class="slider-row">
+              <input type="range" id="img-contrast" min="0.5" max="1.6" step="0.01" value="1">
+              <span id="img-contrast-val">1.00</span>
+            </div>
+          </div>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info"><div class="filter-name">Saturation</div></div>
+            <div class="slider-row">
+              <input type="range" id="img-saturation" min="0" max="2" step="0.01" value="1">
+              <span id="img-saturation-val">1.00</span>
+            </div>
+          </div>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info"><div class="filter-name">Sharpness</div></div>
+            <div class="slider-row">
+              <input type="range" id="img-sharpness" min="0" max="2" step="0.01" value="0">
+              <span id="img-sharpness-val">0.00</span>
+            </div>
+          </div>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info">
+              <div class="filter-name">Surface bump</div>
+              <div class="filter-desc">Micro-relief from the texture's high-frequency luminance.</div>
+            </div>
+            <div class="slider-row">
+              <input type="range" id="img-bump" min="0" max="2" step="0.01" value="0">
+              <span id="img-bump-val">0.00</span>
+            </div>
+          </div>
+
+          <!-- Water shader UI hidden — current implementation isn't fit for
+               purpose. Elements kept in the DOM so existing wiring in main.js
+               continues to work; re-enable by removing the hidden attribute. -->
+          <div hidden>
+            <h3>Water</h3>
+            <label class="filter-row">
+              <input type="checkbox" id="filter-water-shader">
+              <div class="filter-info">
+                <div class="filter-name">Stylized ocean</div>
+                <div class="filter-desc">Waves, foam, and shoreline gradient over heightmap-detected sea.</div>
+              </div>
+            </label>
+            <div class="filter-row filter-row-stack">
+              <div class="filter-info"><div class="filter-name">Shore closeness</div></div>
+              <div class="slider-row">
+                <input type="range" id="water-shore-start" min="0" max="0.8" step="0.02" value="0.30">
+                <span id="water-shore-start-val">0.30</span>
+              </div>
+            </div>
+            <div class="filter-row filter-row-stack">
+              <div class="filter-info"><div class="filter-name">Feather</div></div>
+              <div class="slider-row">
+                <input type="range" id="water-feather" min="0.05" max="0.7" step="0.02" value="0.55">
+                <span id="water-feather-val">0.55</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>Scene</h3>
+          <label class="filter-row">
+            <input type="checkbox" id="filter-fill-light">
+            <div class="filter-info">
+              <div class="filter-name">Fill light</div>
+              <div class="filter-desc">Second cool directional light from opposite the sun. Softens the dark side of buildings &amp; relief.</div>
+            </div>
+          </label>
+
+          <h3>Geometry</h3>
+          <div class="filter-row filter-row-stack">
+            <div class="filter-info">
+              <div class="filter-name">Z-exaggeration</div>
+              <div class="filter-desc">Vertical scale. 1.0× is true-to-life; higher values dramatize relief.</div>
+            </div>
+            <div class="slider-row">
+              <input type="range" id="puck-zexag" min="1" max="2" step="0.05" value="1.0">
+              <span id="puck-zexag-val">1.0×</span>
+            </div>
+          </div>
+        </div>
+        <div id="puck-info"></div>
+      </section>
+
+      <div id="busy" hidden><div class="spinner"></div><div id="busy-text">Working…</div></div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
